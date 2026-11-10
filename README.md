@@ -41,7 +41,7 @@ Full tables with standard deviations: [`results/summary_dubai_marina.md`](result
 ## Findings
 
 1. **Below capacity, strategy barely matters**, with one exception: `greedy_nearest` is 2–3 min worse, because the lowest-id courier takes the only waiting order wherever that courier is.
-2. **Near and above capacity, oldest-first collapses.** At peak, Hungarian saves 14.6 min per order over `greedy`. **About 13.6 min of that (≈93%) comes simply from serving the nearest order**, as the `greedy_nearest` control shows. Optimal joint matching adds about 1 min on top. Small, but real: on the grid it beat `greedy_nearest` by 1.6 min at busy demand, 95% CI [1.2, 2.0].
+2. **Near and above capacity, oldest-first collapses.** At peak, Hungarian saves 14.6 min per order over `greedy`. **About 13.6 min of that (≈93%) comes simply from serving the nearest order**, as the `greedy_nearest` control shows. Optimal joint matching adds about 1 min on top. Small, but real: on the grid it beat `greedy_nearest` by 1.4 min at busy demand (95% CI [1.2, 1.6], 93/100 seeds) and 1.7 min at rush (95% CI [1.5, 2.0], 97/100 seeds).
 3. **Batching never paid off.** Its cost matches theory: average wait-to-assign grows by half the batch interval (0.08 → 0.25 → 0.50 → 1.01 min at quiet demand), and better matches never won that time back.
 4. **Nearest-first strategies sacrifice the unluckiest customer.** On the grid at rush hour, `greedy` gave a lower worst-case delivery time than `hungarian` by 5.4 min (paired, 100 seeds, 95% CI [1.6, 9.2]), but `greedy` won on only 55/100 shifts. The starvation is rare but large. On real streets the gap grows to **about 24 min at peak** (88.7 vs 112.6), because detours and one-way roads create far-away pockets that nearest-first keeps skipping.
 
