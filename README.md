@@ -1,6 +1,6 @@
 # Courier Dispatch Simulator
 
-When food and grocery orders arrive faster than a platform can think, *which courier gets which order* decides how long customers wait. This project simulates a city of orders and couriers, on a grid and on real Dubai Marina streets, and compares dispatch strategies on delivery time, courier idle time and fairness.
+When food and grocery orders arrive faster than a platform can think, *which courier gets which order* decides how long customers wait. This project simulates a city of orders and couriers, on a grid and on real streets in Dubai Marina and Istanbul Kadıköy, and compares dispatch strategies on delivery time, courier idle time and fairness.
 
 ![Dubai Marina at peak demand](results/snapshot_dubai_marina.png)
 
@@ -43,7 +43,21 @@ Full tables with standard deviations: [`results/summary_dubai_marina.md`](result
 1. **Below capacity, strategy barely matters**, with one exception: `greedy_nearest` is 2–3 min worse, because the lowest-id courier takes the only waiting order wherever that courier is.
 2. **Near and above capacity, oldest-first collapses.** At peak, Hungarian saves 14.6 min per order over `greedy`. **About 13.6 min of that (≈93%) comes simply from serving the nearest order**, as the `greedy_nearest` control shows. Optimal joint matching adds about 1 min on top. Small, but real: on the grid it beat `greedy_nearest` by 1.4 min at busy demand (95% CI [1.2, 1.6], 93/100 seeds) and 1.7 min at rush (95% CI [1.5, 2.0], 97/100 seeds).
 3. **Batching never paid off.** Its cost matches theory: average wait-to-assign grows by half the batch interval (0.08 → 0.25 → 0.50 → 1.01 min at quiet demand), and better matches never won that time back.
-4. **Nearest-first strategies sacrifice the unluckiest customer.** On the grid at rush hour, `greedy` gave a lower worst-case delivery time than `hungarian` by 5.4 min (paired, 100 seeds, 95% CI [1.6, 9.2]), but `greedy` won on only 55/100 shifts. The starvation is rare but large. On real streets the gap grows to **about 24 min at peak** (88.7 vs 112.6), because detours and one-way roads create far-away pockets that nearest-first keeps skipping.
+4. **Nearest-first strategies sacrifice the unluckiest customer, and how much depends on overload and street layout.** Worst-case delivery time, Hungarian minus Greedy (paired, 100 seeds, 95% CI; positive = Hungarian worse):
+
+| city | rush (120/h) | peak (150/h) |
+|---|---|---|
+| Grid | +5.4 [+1.6, +9.2], Greedy better on 55/100 | not run |
+| Istanbul Kadıköy | +3.2 [−0.1, +6.4], no clear difference | +16.4 [+12.3, +20.4], Greedy better on 77/100 |
+| Dubai Marina | +10.3 [+6.3, +14.3], Greedy better on 60/100 | +23.9 [+19.4, +28.4], Greedy better on 83/100 |
+
+At rush, starvation is rare but large; at peak, Hungarian's worst customer is worse on most shifts. **Before running Kadıköy I predicted** its gap would be smaller than Dubai's, because its longest trip is far shorter (15.4 vs 28.2 min), so it has fewer far-away pockets for nearest-first to keep skipping. It was smaller at both levels, but the intervals nearly touch, and Kadıköy is also slightly less overloaded at the same demand. So this supports the explanation rather than proving it.
+
+## Third city: Istanbul Kadıköy
+
+Dense old street network (920 junctions vs Dubai's 366, same 3 km area). The ranking replicates for the third time: at peak, `greedy` 41.5 min, `greedy_nearest` 29.6, `hungarian` 28.5, `batch_60s` 30.2. Again about 92% of Hungarian's gain over `greedy` comes from the nearest-order rule. Full table: [`results/summary_istanbul_kadikoy.md`](results/summary_istanbul_kadikoy.md).
+
+![Istanbul Kadıköy at peak demand](results/snapshot_istanbul_kadikoy.png)
 
 ## What surprised me
 
@@ -61,7 +75,7 @@ Food is ready the instant it is ordered (this is why batching cannot win). Const
 - **Age-aware matching cost**, e.g. `travel_time − α·time_waited`, to keep Hungarian's mean without its worst-case starvation.
 - **Rebalancing** idle couriers toward predicted demand, and **stacked orders** (two orders per trip).
 - **Learning-based dispatch** evaluated against these baselines.
-- More cities: `python -m experiments.run_real istanbul_kadikoy`.
+- More cities (e.g. Casablanca) by adding a centre point to `PLACES` in `sim/real_city.py`.
 
 ## How to run
 

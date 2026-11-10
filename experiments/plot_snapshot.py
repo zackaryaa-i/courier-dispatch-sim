@@ -68,7 +68,7 @@ def main() -> None:
         city, title_city = make_grid_city(), "grid city"
     else:
         from sim.real_city import load_real_city
-        city, title_city = load_real_city(name), name.replace("_", " ").title()
+        city, title_city = load_real_city(name), {"istanbul_kadikoy": "Istanbul Kadıköy"}.get(name, name.replace("_", " ").title())
 
     rng = np.random.default_rng(SEED)
     hotspots = pick_hotspots(city, 5, rng)
@@ -103,7 +103,7 @@ def main() -> None:
     ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.03),
               ncol=3, frameon=False, fontsize=8, labelcolor=INK)
     ax.set_title(f"Minute {SNAPSHOT_AT // 60} of an overloaded shift, {title_city}\n"
-                 f"{per_hour} orders/h, {N_COURIERS} couriers, Hungarian matching. "
+                 f"{per_hour} orders/h, {N_COURIERS} couriers, Hungarian matching.\n"
                  f"Axes in km; dotted = remaining route.",
                  loc="left", color=INK, fontsize=10)
     ax.set_aspect("equal")

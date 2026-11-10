@@ -1,4 +1,7 @@
-"""Paired comparison: each strategy minus Hungarian, seed by seed."""
+"""Paired comparison: each strategy minus Hungarian, seed by seed.
+
+Usage: python -m experiments.paired [metric] [city]
+"""
 import csv
 import sys
 from collections import defaultdict
@@ -6,22 +9,23 @@ from collections import defaultdict
 import numpy as np
 from scipy import stats
 
-IN = "results/results.csv"
 BASELINE = "hungarian"
-DEMAND_ORDER = ["quiet", "normal", "busy", "rush"]
+DEMAND_ORDER = ["quiet", "normal", "busy", "rush", "peak"]
 
 
-def main(metric: str) -> None:
-    with open(IN) as f:
+def main(metric: str, city: str) -> None:
+    src = f"results/results_{city}.csv" if city else "results/results.csv"
+    with open(src) as f:
         rows = list(csv.DictReader(f))
     value = defaultdict(dict)   # (demand, strategy) -> {seed: value}
     for r in rows:
         value[(r["demand"], r["strategy"])][r["seed"]] = float(r[metric])
     strategies = [s for s in dict.fromkeys(r["strategy"] for r in rows) if s != BASELINE]
+    levels = [d for d in DEMAND_ORDER if (d, BASELINE) in value]
 
-    print(f"metric: {metric}   (positive = worse than {BASELINE}, if lower is better)\n")
+    print(f"{city or 'grid'} | metric: {metric}   (positive = worse than {BASELINE}, if lower is better)\n")
     print(f"{'demand':<7} {'strategy':<15} {'mean diff':>9}   {'95% CI':<17} {'worse on':>9}")
-    for d in DEMAND_ORDER:
+    for d in levels:
         base = value[(d, BASELINE)]
         for s in strategies:
             other = value[(d, s)]
@@ -34,4 +38,6 @@ def main(metric: str) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "mean_delivery_min")
+    metric = sys.argv[1] if len(sys.argv) > 1 else "mean_delivery_min"
+    city = sys.argv[2] if len(sys.argv) > 2 else ""
+    main(metric, city)
