@@ -19,3 +19,26 @@ class Greedy:
             result.append((best, order))
             free.remove(best)
         return result
+
+
+class NearestOrderGreedy:
+    """Control: each free courier (by id) takes the nearest waiting order.
+
+    Same one-at-a-time logic as Greedy, but the courier picks the order
+    rather than the order picking the courier. Used to test whether
+    Hungarian's win comes from matching or just from serving nearby orders.
+    """
+    name = "greedy_nearest"
+
+    def assign(
+        self, now: float, idle: list[Courier], waiting: list[Order], city: City
+    ) -> list[Assignment]:
+        left = list(waiting)
+        result: list[Assignment] = []
+        for courier in sorted(idle, key=lambda c: c.id):
+            if not left:
+                break
+            best = min(left, key=lambda o: (city.travel_time(courier.node, o.pickup), o.id))
+            result.append((courier, best))
+            left.remove(best)
+        return result
