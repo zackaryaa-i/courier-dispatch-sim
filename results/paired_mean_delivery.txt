@@ -1,0 +1,27 @@
+metric: mean_delivery_min   (positive = worse than hungarian, if lower is better)
+
+demand  strategy        mean diff   95% CI             worse on
+quiet   greedy              +0.01   [ -0.00,  +0.03]    18/100
+quiet   greedy_nearest      +3.73   [ +3.53,  +3.93]   100/100
+quiet   batch_30s           +0.15   [ +0.13,  +0.17]    94/100
+quiet   batch_60s           +0.37   [ +0.35,  +0.40]   100/100
+quiet   batch_120s          +0.82   [ +0.78,  +0.86]   100/100
+
+normal  greedy              +0.60   [ +0.27,  +0.93]    65/100
+normal  greedy_nearest      +2.79   [ +2.58,  +3.00]    99/100
+normal  batch_30s           +0.11   [ +0.06,  +0.17]    76/100
+normal  batch_60s           +0.28   [ +0.23,  +0.33]    88/100
+normal  batch_120s          +0.65   [ +0.58,  +0.71]    96/100
+
+busy    greedy              +9.81   [ +9.07, +10.55]   100/100
+busy    greedy_nearest      +1.42   [ +1.23,  +1.61]    93/100
+busy    batch_30s           +0.28   [ +0.18,  +0.38]    72/100
+busy    batch_60s           +0.61   [ +0.48,  +0.73]    81/100
+busy    batch_120s          +1.38   [ +1.20,  +1.57]    95/100
+
+rush    greedy             +13.67   [+13.14, +14.20]   100/100
+rush    greedy_nearest      +1.74   [ +1.53,  +1.95]    97/100
+rush    batch_30s           +0.52   [ +0.42,  +0.63]    84/100
+rush    batch_60s           +1.03   [ +0.91,  +1.14]    96/100
+rush    batch_120s          +2.20   [ +2.01,  +2.39]    98/100
+

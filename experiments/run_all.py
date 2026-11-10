@@ -16,7 +16,7 @@ from strategies.hungarian import Hungarian
 SHIFT = 2 * 3600
 N_COURIERS = 20
 N_HOTSPOTS = 5
-SEEDS = range(20)
+SEEDS = range(100)
 DEMAND = {"quiet": 40, "normal": 60, "busy": 90, "rush": 120}   # orders/hour
 STRATEGIES = [
     Greedy(),
