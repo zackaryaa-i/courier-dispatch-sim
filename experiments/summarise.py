@@ -1,11 +1,11 @@
-"""results/results.csv -> mean ± sd per (demand, strategy) -> results/summary.md"""
+"""results CSV -> mean ± sd per (demand, strategy) -> markdown table."""
 import csv
+import sys
 from collections import defaultdict
 
 import numpy as np
 
-IN, OUT = "results/results.csv", "results/summary.md"
-DEMAND_ORDER = ["quiet", "normal", "busy", "rush"]
+DEMAND_ORDER = ["quiet", "normal", "busy", "rush", "peak"]
 COLS = [  # (csv column, header, decimals)
     ("mean_delivery_min", "mean delivery (min)", 1),
     ("p90_delivery_min", "p90 (min)", 1),
@@ -17,14 +17,17 @@ COLS = [  # (csv column, header, decimals)
 ]
 
 
-def main() -> None:
-    with open(IN) as f:
+def main(suffix: str) -> None:
+    tag = f"_{suffix}" if suffix else ""
+    src, out = f"results/results{tag}.csv", f"results/summary{tag}.md"
+    with open(src) as f:
         rows = list(csv.DictReader(f))
     groups = defaultdict(list)
     for r in rows:
         groups[(r["demand"], r["strategy"])].append(r)
     strategies = list(dict.fromkeys(r["strategy"] for r in rows))  # keeps run order
-    n_seeds = len(groups[(rows[0]["demand"], rows[0]["strategy"])])
+    levels = [d for d in DEMAND_ORDER if any(r["demand"] == d for r in rows)]
+    n_seeds = len(groups[(levels[0], strategies[0])])
 
     lines = [
         f"Mean ± standard deviation across {n_seeds} seeds.",
@@ -32,7 +35,7 @@ def main() -> None:
         "| demand | strategy | " + " | ".join(h for _, h, _ in COLS) + " |",
         "|" + "---|" * (len(COLS) + 2),
     ]
-    for d in DEMAND_ORDER:
+    for d in levels:
         for s in strategies:
             g = groups[(d, s)]
             cells = []
@@ -42,10 +45,10 @@ def main() -> None:
             lines.append(f"| {d} | {s} | " + " | ".join(cells) + " |")
 
     text = "\n".join(lines)
-    with open(OUT, "w") as f:
+    with open(out, "w") as f:
         f.write(text + "\n")
     print(text)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else "")

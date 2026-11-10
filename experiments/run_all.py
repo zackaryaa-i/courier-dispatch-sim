@@ -1,10 +1,10 @@
-"""Every strategy x every demand level x many seeds -> results/results.csv"""
+"""Every strategy x every demand level x many seeds -> CSV."""
 import csv
 import time
 
 import numpy as np
 
-from sim.city import make_grid_city
+from sim.city import City, make_grid_city
 from sim.demand import generate_orders, pick_hotspots
 from sim.fleet import make_couriers
 from sim.metrics import compute_metrics
@@ -26,14 +26,12 @@ STRATEGIES = [
     BatchedHungarian(60),
     BatchedHungarian(120),
 ]
-OUT = "results/results.csv"
 
 
-def main() -> None:
-    city = make_grid_city()          # one city, so the distance cache is shared
+def run_experiment(city: City, demand: dict[str, int], out: str) -> None:
     rows = []
     start = time.time()
-    for level, per_hour in DEMAND.items():
+    for level, per_hour in demand.items():
         for seed in SEEDS:
             rng = np.random.default_rng(seed)
             hotspots = pick_hotspots(city, N_HOTSPOTS, rng)
@@ -46,12 +44,12 @@ def main() -> None:
                              **compute_metrics(res)})
         print(f"{level:<7} done  ({time.time() - start:.0f}s elapsed)")
 
-    with open(OUT, "w", newline="") as f:
+    with open(out, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=rows[0].keys())
         writer.writeheader()
         writer.writerows(rows)
-    print(f"wrote {len(rows)} rows to {OUT}")
+    print(f"wrote {len(rows)} rows to {out}")
 
 
 if __name__ == "__main__":
-    main()
+    run_experiment(make_grid_city(), DEMAND, "results/results.csv")
