@@ -5,13 +5,21 @@ from sim.city import make_grid_city
 from sim.demand import generate_orders, pick_hotspots
 from sim.fleet import make_couriers
 from sim.simulator import run_simulation
+from strategies.batching import BatchedHungarian
 from strategies.greedy import Greedy, NearestOrderGreedy
 from strategies.hungarian import Hungarian
 
 SEED = 0
 SHIFT = 2 * 3600
 N_COURIERS = 20
-STRATEGIES = [Greedy(), NearestOrderGreedy(), Hungarian()]
+STRATEGIES = [
+    Greedy(),
+    NearestOrderGreedy(),
+    Hungarian(),
+    BatchedHungarian(30),
+    BatchedHungarian(60),
+    BatchedHungarian(120),
+]
 
 
 def summarise(res):
